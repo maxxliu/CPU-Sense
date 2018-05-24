@@ -32,7 +32,7 @@ def prepare_data_exp1(seq, data):
     for stage in data:
         per_stage = []
         for entry in stage:
-            row = [cpu_percent[0] for cpu_percent in entry[0]]
+            row = [cpu_freq[0] for cpu_freq in entry[0]]
             row += entry[1][2:4]
             row += entry[2][0:2]
             per_stage.append(row)
@@ -64,7 +64,7 @@ def prepare_data_exp2(seq, data):
     final_form = []
     for i in range(0, len(data)):
         for entry in data[i]:
-            row = [cpu_percent for cpu_percent in entry[0]]
+            row = [cpu_freq[0] for cpu_freq in entry[0]]
             row += entry[1][2:4]
             row += entry[2][0:2]
             row = tags[i] + row
@@ -72,11 +72,11 @@ def prepare_data_exp2(seq, data):
     return final_form
 
 
-def dump_data(data, experiment, sequence):
+def dump_data(data, experiment, sequence, exp_num):
     header = []
     for i in range(0, 5):
         header.append("App" + str(i + 1))
-    for i in range(0, len(psutil.cpu_percent(percpu=True))):
+    for i in range(0, len(psutil.cpu_freq(percpu=True))):
         header.append("CPU" + str(i + 1))
     header.append("read_bytes")
     header.append("write_bytes")
@@ -86,7 +86,8 @@ def dump_data(data, experiment, sequence):
         data_consolidated = prepare_data_exp1(sequence, data)
     elif experiment == 2:
         data_consolidated = prepare_data_exp2(sequence, data)
-    with open("dump.csv", "w") as csvfile:
+    with open("{0}_{1}_{2}.csv"
+              .format(experiment, sequence, exp_num), "w") as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(header)
         for row in data_consolidated:
@@ -158,7 +159,7 @@ def experiment1(seq):
     temp_divide.value = 1
     if seq == 1:
         camera = Applications.VideoRecorder()
-        camera.turn_on(3)
+        camera.turn_on(16)
         camera.destroy()
     elif seq == 2:
         camera = Applications.VideoRecorder()
@@ -184,11 +185,12 @@ def experiment1(seq):
 
 
 def main(experiment, sequence):
-    if experiment == 1:
-        data = experiment1(sequence)
-    else:
-        data = experiment2(sequence)
-    dump_data(data, experiment, sequence)
+    for i in range(0, 10):
+        if experiment == 1:
+            data = experiment1(sequence)
+        else:
+            data = experiment2(sequence)
+        dump_data(data, experiment, sequence, i + 1)
 
 
 if __name__ == "__main__":
