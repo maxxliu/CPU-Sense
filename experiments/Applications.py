@@ -80,7 +80,7 @@ class VoiceRecorder:
     def __init__(self):
         self.CHUNK = 1024
         self.FORMAT = pyaudio.paInt16
-        self.CHApppNNELS = 2
+        self.CHANNELS = 2
         self.RATE = 44100
         self.recorder = pyaudio.PyAudio()
 

@@ -4,7 +4,8 @@ import csv
 
 # this is the information we are collecting
 # 14 columns
-COL_HEADERS = ['t', 'a1', 'a2', 'a3', 'a4', 'a5', 'cpu1', 'cpu2', 'cpu3', 'cpu4', 'r', 'w', 'n_in', 'n_out']
+COL_HEADERS = ['App1', 'App2', 'App3', 'App4', 'App5', 'CPU1', 'CPU2', 'CPU3', \
+                'CPU4', 'read_bytes', 'write_bytes', 'bytes_sent', 'bytes_recv']
 
 NULL_ROWS_B = 20 * 2 # 20 readings a second and run nothing for 2 seconds
 NULL_ROWS_A = 20 * 5 # 20 readings a second and run nothing for 5 seconds
@@ -15,16 +16,13 @@ APP_ROWS = 20 * 13 # 20 readings a second and run each app for 13 seconds
 csv_out = []
 time = 0
 for i in range(NULL_ROWS_B):
-    time += 1
-    data = [time, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     csv_out.append(data)
 for i in range(APP_ROWS):
-    time += 1
-    data = [time, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    data = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     csv_out.append(data)
 for i in range(NULL_ROWS_A):
-    time += 1
-    data = [time, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     csv_out.append(data)
 
 with open("exp1_example.csv", "w") as file:
@@ -38,20 +36,16 @@ with open("exp1_example.csv", "w") as file:
 csv_out = []
 time = 0
 for i in range(NULL_ROWS_B): # nothing running
-    time += 1
-    data = [time, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     csv_out.append(data)
 for i in range(APP_ROWS): # app 1 starts running
-    time += 1
-    data = [time, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    data = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     csv_out.append(data)
 for i in range(APP_ROWS): # app 3 starts running
-    time += 1
-    data = [time, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    data = [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     csv_out.append(data)
 for i in range(APP_ROWS): # app 5 starts running
-    time += 1
-    data = [time, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+    data = [1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
     csv_out.append(data)
 
 with open("exp2_example.csv", "w") as file:

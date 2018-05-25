@@ -2,6 +2,7 @@ import pandas as pd
 import csv
 import numpy as np
 from statistics import *
+import os
 
 
 # global variables
@@ -30,12 +31,11 @@ def find_app_changes(df):
 
     prev_apps_running = [0, 0, 0, 0, 0]
     for index, row in df.iterrows():
-        cur_apps_running = [row['a1'], row['a2'], row['a3'], row['a4'], row['a5']]
+        cur_apps_running = [row['App1'], row['App2'], row['App3'], row['App4'], row['App5']]
         for i in range(len(prev_apps_running)):
             if prev_apps_running[i] != cur_apps_running[i]:
                 app_changed = i + 1
-                time = row['t']
-                change_times.append((app_changed, time, index, prev_apps_running))
+                change_times.append((app_changed, index, prev_apps_running))
                 break
         prev_apps_running = cur_apps_running
 
@@ -52,23 +52,23 @@ def reformat_data(df, change_times, csv_out):
     NOTE: part description no longer up to date
     '''
     for change in change_times:
-        index = change[2]
+        index = change[1]
         app_changed = change[0]
-        prev_state = change[3]
-        cpu1 = list(df['cpu1'][index-(READINGS_SEC*1):index+(READINGS_SEC*8)])
-        cpu2 = list(df['cpu2'][index-(READINGS_SEC*1):index+(READINGS_SEC*8)])
-        cpu3 = list(df['cpu3'][index-(READINGS_SEC*1):index+(READINGS_SEC*8)])
-        cpu4 = list(df['cpu4'][index-(READINGS_SEC*1):index+(READINGS_SEC*8)])
+        prev_state = change[2]
+        cpu1 = list(df['CPU1'][index-(READINGS_SEC*1):index+(READINGS_SEC*8)])
+        cpu2 = list(df['CPU2'][index-(READINGS_SEC*1):index+(READINGS_SEC*8)])
+        cpu3 = list(df['CPU3'][index-(READINGS_SEC*1):index+(READINGS_SEC*8)])
+        cpu4 = list(df['CPU4'][index-(READINGS_SEC*1):index+(READINGS_SEC*8)])
         cpu_avg = list([sum([cpu1[i], cpu2[i], cpu3[i], cpu4[i]])/4 for i in range(len(cpu1))])
         cpu1_d1 = list(np.gradient(np.array(cpu1)))
         cpu2_d1 = list(np.gradient(np.array(cpu2)))
         cpu3_d1 = list(np.gradient(np.array(cpu3)))
         cpu4_d1 = list(np.gradient(np.array(cpu4)))
         cpu_avg_d1 = list(np.gradient(np.array(cpu_avg)))
-        r = list(df['r'][index-(READINGS_SEC*1):index+(READINGS_SEC*8)])
-        w = list(df['w'][index-(READINGS_SEC*1):index+(READINGS_SEC*8)])
-        n_in = list(df['n_in'][index-(READINGS_SEC*1):index+(READINGS_SEC*8)])
-        n_out = list(df['n_out'][index-(READINGS_SEC*1):index+(READINGS_SEC*8)])
+        r = list(df['read_bytes'][index-(READINGS_SEC*1):index+(READINGS_SEC*8)])
+        w = list(df['write_bytes'][index-(READINGS_SEC*1):index+(READINGS_SEC*8)])
+        n_in = list(df['bytes_sent'][index-(READINGS_SEC*1):index+(READINGS_SEC*8)])
+        n_out = list(df['bytes_recv'][index-(READINGS_SEC*1):index+(READINGS_SEC*8)])
         r_d1 = list(np.gradient(np.array(r)))
         w_d1 = list(np.gradient(np.array(w)))
         n_in_d1 = list(np.gradient(np.array(n_in)))
@@ -86,20 +86,20 @@ def reformat_data(df, change_times, csv_out):
         of 9-10 seconds where this app is just running. I want to include a
         data line of this period where no new apps are being added.
         '''
-        cpu1 = list(df['cpu1'][index+(READINGS_SEC*3):index+(READINGS_SEC*12)])
-        cpu2 = list(df['cpu2'][index+(READINGS_SEC*3):index+(READINGS_SEC*12)])
-        cpu3 = list(df['cpu3'][index+(READINGS_SEC*3):index+(READINGS_SEC*12)])
-        cpu4 = list(df['cpu4'][index+(READINGS_SEC*3):index+(READINGS_SEC*12)])
+        cpu1 = list(df['CPU1'][index+(READINGS_SEC*3):index+(READINGS_SEC*12)])
+        cpu2 = list(df['CPU2'][index+(READINGS_SEC*3):index+(READINGS_SEC*12)])
+        cpu3 = list(df['CPU3'][index+(READINGS_SEC*3):index+(READINGS_SEC*12)])
+        cpu4 = list(df['CPU4'][index+(READINGS_SEC*3):index+(READINGS_SEC*12)])
         cpu_avg = [sum([cpu1[i], cpu2[i], cpu3[i], cpu4[i]])/4 for i in range(len(cpu1))]
         cpu1_d1 = list(np.gradient(np.array(cpu1)))
         cpu2_d1 = list(np.gradient(np.array(cpu2)))
         cpu3_d1 = list(np.gradient(np.array(cpu3)))
         cpu4_d1 = list(np.gradient(np.array(cpu4)))
         cpu_avg_d1 = list(np.gradient(np.array(cpu_avg)))
-        r = list(df['r'][index+(READINGS_SEC*3):index+(READINGS_SEC*12)])
-        w = list(df['w'][index+(READINGS_SEC*3):index+(READINGS_SEC*12)])
-        n_in = list(df['n_in'][index+(READINGS_SEC*3):index+(READINGS_SEC*12)])
-        n_out = list(df['n_out'][index+(READINGS_SEC*3):index+(READINGS_SEC*12)])
+        r = list(df['read_bytes'][index+(READINGS_SEC*3):index+(READINGS_SEC*12)])
+        w = list(df['write_bytes'][index+(READINGS_SEC*3):index+(READINGS_SEC*12)])
+        n_in = list(df['bytes_sent'][index+(READINGS_SEC*3):index+(READINGS_SEC*12)])
+        n_out = list(df['bytes_recv'][index+(READINGS_SEC*3):index+(READINGS_SEC*12)])
         r_d1 = list(np.gradient(np.array(r)))
         w_d1 = list(np.gradient(np.array(w)))
         n_in_d1 = list(np.gradient(np.array(n_in)))
@@ -132,7 +132,6 @@ def add_statistics_data(csv_out):
                 max_ = max(item)
                 min_ = min(item)
                 csv_out[i].extend([a_mean, n_median, sd, var, max_, min_])
-
 
 
 def process_files(files, exp):
@@ -170,10 +169,10 @@ def process_files(files, exp):
 
     # outputname
     if exp == 1:
-        outputname = 'experiment1_data.csv'
+        outputname = '../data/experiment1_data.csv'
     else:
         # must be experiment 2
-        outputname = 'experiment2_data.csv'
+        outputname = '../data/experiment2_data.csv'
     # write the new data to a file
     with open(outputname, "w") as file:
         writer = csv.writer(file, delimiter=',')
@@ -183,5 +182,33 @@ def process_files(files, exp):
 
     return
 
-files = ['exp2_example.csv', 'exp2_example_2.csv']
-process_files(files, 2)
+# testing to make sure my changes still work
+# files = ['exp2_example.csv']
+# process_files(files, 2)
+
+def get_exp1_files():
+    '''
+    returns a list of experiment 1 data files
+    '''
+    filepath = '../../experiments/exp_1_data/'
+    files = [filepath + f for f in os.listdir(filepath)]
+
+    return files
+
+
+def get_exp2_files():
+    '''
+    returns a list of experiment 2 data files
+    '''
+    filepath = '../../experiments/exp_2_data/'
+    files = [filepath + f for f in os.listdir(filepath)]
+
+    return files
+
+
+if __name__ == '__main__':
+    exp1_files = get_exp1_files() # data for exp 1
+    exp2_files = get_exp2_files() # data for exp 2
+
+    process_files(exp1_files, 1) # process exp 1 data
+    process_files(exp2_files, 2) # process exp 2 data

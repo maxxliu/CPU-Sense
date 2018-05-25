@@ -28,6 +28,8 @@ EXTRA_CPU = ['cpu1_mean','cpu1_median','cpu1_sd','cpu1_var','cpu1_max',\
 
 def binary_prep(filename, mode):
     '''
+    prepares data to feed into a binary classification model
+
     mode (int)
         1 - use all data except for timeseries
         2 - use all data except for timeseries and r, w, n_in, n_out data
@@ -46,3 +48,48 @@ def binary_prep(filename, mode):
         df = df.drop(TS_COLS, axis=1)
         df = df.drop(EXTRA_COLS, axis=1)
         df = df.drop(EXTRA_CPU, axis=1)
+
+    y_var = 'change' # this is what we are trying to predict
+    app_data = 'app' # this is data about what app just opened
+    x = df.drop([y_var, app_data], axis=1)
+    y = df[y_var]
+
+    x_train, x_test, y_train, y_test = train_test_split(x, y, \
+                                                        test_size=0.2, \
+                                                        random_state=20)
+
+    return x_train, x_test, y_train, y_test
+
+
+def app_prep(filename, mode):
+    '''
+    prepares data to feed into classification model
+
+    mode (int)
+        1 - use all data except for timeseries
+        2 - use all data except for timeseries and r, w, n_in, n_out data
+        3 - use only the cpu_avg data
+
+    return
+        x_train, x_test, y_train, y_test
+    '''
+    df = pd.read_csv(filename)
+    if mode is 1:
+        df = df.drop(TS_COLS, axis=1)
+    elif mode is 2:
+        df = df.drop(TS_COLS, axis=1)
+        df = df.drop(EXTRA_COLS, axis=1)
+    elif mode is 3:
+        df = df.drop(TS_COLS, axis=1)
+        df = df.drop(EXTRA_COLS, axis=1)
+        df = df.drop(EXTRA_CPU, axis=1)
+
+    y_var = 'app' # this is what we are trying to predict
+    x = df.drop([y_var], axis=1)
+    y = df[y_var]
+
+    x_train, x_test, y_train, y_test = train_test_split(x, y, \
+                                                        test_size=0.2, \
+                                                        random_state=20)
+
+    return x_train, x_test, y_train, y_test
