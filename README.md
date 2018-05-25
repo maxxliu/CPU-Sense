@@ -16,6 +16,9 @@ Now for the models that we want to create:
 We want to know if there has been any change to the state of the device.
 Has a new app started to run?
 
+- SVM
+- Logistic Regression
+
 ### [2] App Classifier
 Can we tell you what new app has started to run?
 For this we can use the same type of data as **[1]**.
@@ -23,6 +26,10 @@ For this we can use the same type of data as **[1]**.
 **Furthermore:**
 Assumption: We KNOW that an app has started to run.
 Is our classifier better than before?
+
+ - Random Forest
+ - Adaboost
+ - Gradientboost
 
 ### [3] Device State Classifier
 Can we tell you what apps are running without any prior knowledge?

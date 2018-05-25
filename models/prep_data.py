@@ -26,7 +26,7 @@ EXTRA_CPU = ['cpu1_mean','cpu1_median','cpu1_sd','cpu1_var','cpu1_max',\
 'cpu3_d1_sd','cpu3_d1_var','cpu3_d1_max','cpu3_d1_min','cpu4_d1_mean',\
 'cpu4_d1_median','cpu4_d1_sd','cpu4_d1_var','cpu4_d1_max','cpu4_d1_min']
 
-def binary_prep(filename, mode):
+def binary_prep(filename, mode, test_size=0.2, seed=20):
     '''
     prepares data to feed into a binary classification model
 
@@ -55,13 +55,13 @@ def binary_prep(filename, mode):
     y = df[y_var]
 
     x_train, x_test, y_train, y_test = train_test_split(x, y, \
-                                                        test_size=0.2, \
-                                                        random_state=20)
+                                                        test_size=test_size, \
+                                                        random_state=seed)
 
     return x_train, x_test, y_train, y_test
 
 
-def app_prep(filename, mode):
+def app_prep(filename, mode, test_size=0.2, seed=20):
     '''
     prepares data to feed into classification model
 
@@ -85,11 +85,12 @@ def app_prep(filename, mode):
         df = df.drop(EXTRA_CPU, axis=1)
 
     y_var = 'app' # this is what we are trying to predict
-    x = df.drop([y_var], axis=1)
+    # change is the column that is telling us if an app was opened
+    x = df.drop([y_var, 'change'], axis=1)
     y = df[y_var]
 
     x_train, x_test, y_train, y_test = train_test_split(x, y, \
-                                                        test_size=0.2, \
-                                                        random_state=20)
+                                                        test_size=test_size, \
+                                                        random_state=seed)
 
     return x_train, x_test, y_train, y_test
