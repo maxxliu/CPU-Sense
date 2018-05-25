@@ -1,11 +1,11 @@
 import time
 import psutil
 import multiprocessing
-import thread
+from threading import Thread
 import csv
 import copy
 import Applications
-import cv2
+import os
 from sys import argv
 
 
@@ -50,12 +50,12 @@ def prepare_data_exp1(seq, data):
 
 
 def prepare_data_exp2(seq, data):
-    possible_sequences = [[1, 2, 3, 4],
-                          [2, 3, 4],
-                          [2, 4],
-                          [2, 3],
-                          [3],
-                          [2]]
+    possible_sequences = [[1, 2, 3, 4, 5],
+                          [2, 3, 4, 5],
+                          [2, 4, 5],
+                          [2, 3, 5],
+                          [3, 5],
+                          [2, 5]]
     tags = [[0] * 5]
     for i in possible_sequences[seq - 1]:
         last_tag = copy.deepcopy(tags[-1])
@@ -95,37 +95,40 @@ def dump_data(data, experiment, sequence, exp_num):
         csvfile.close()
 
 
-def get_exp2_seq(seq, video_app, fdetector, voice_app):
+def get_exp2_seq(seq, video_app, voice_app, network_app):
     if seq == 1:
-        sequence = [video_app.turn_on,
-                    video_app.turn_on_record,
-                    fdetector.turn_on, voice_app]
+        sequence = [("f", video_app.hybrid, [0, 1, 0, 0]),
+                    ("l", [0, 1, 1, 0]),
+                    ("l", [0, 1, 1, 1]),
+                    ("fs", voice_app.record), ("fn", network_app.transfer)]
     elif seq == 2:
-        sequence = [video_app.turn_on_record,
-                    fdetector.turn_on,
-                    voice_app]
+        sequence = [("f", video_app.hybrid, [0, 0, 1, 0]),
+                    ("l", [0, 0, 0, 1]),
+                    ("fs", voice_app.record), ("fn", network_app.transfer)]
     elif seq == 3:
-        sequence = [video_app.turn_on_record,
-                    voice_app.record]
+        sequence = [("f", video_app.hybrid, [0, 0, 1, 0]),
+                    ("fs", voice_app.record), ("fn", network_app.transfer)]
     elif seq == 4:
-        sequence = [video_app.turn_on_record,
-                    fdetector.turn_on]
+        sequence = [("f", video_app.hybrid, [0, 0, 1, 0]),
+                    ("l", [0, 0, 1, 1]), ("fn", network_app.transfer)]
     elif seq == 5:
-        sequence = [fdetector.turn_on_record]
+        sequence = [("f", video_app.hybrid, [0, 0, 0, 1]),
+                    ("fn", network_app.transfer)]
     elif seq == 6:
-        sequence = [video_app.turn_on_record]
+        sequence = [("f", video_app.hybrid, [0, 0, 1, 0]),
+                    ("fn", network_app.transfer)]
+        # Add application 5 later
     return sequence
 
 
 def experiment2(seq):
-    common_camera = cv2.VideoCapture()
-    video_app = Applications.VideoRecorder(camera=common_camera)
-    fdetector = Applications.FaceDetector(camera=common_camera)
-    voice_app = Applications.VoiceRecorder(camera=common_camera)
-    sequence = get_exp2_seq(seq, video_app, fdetector, voice_app)
-    times = [10]
+    video_app = Applications.VideoRecorder()
+    voice_app = Applications.VoiceRecorder()
+    network_app = Applications.NetworkApplication()
+    sequence = get_exp2_seq(seq, video_app, voice_app, network_app)
+    times = [20]
     for i in range(0, len(sequence) - 1):
-        times = [10 + 13 + times[0]] + times
+        times = [13 + times[0]] + times
     # Turn on monitor
     manager = multiprocessing.Manager()
     data = manager.list([])
@@ -133,16 +136,39 @@ def experiment2(seq):
     temp_divide = multiprocessing.Value('i', 0)
     monitor = multiprocessing.Process(target=record_utilization,
                                       args=(data, stop, temp_divide))
+    print "Starting experiment"
+    threads = []
     monitor.start()
     time.sleep(2)
-    for application in sequence:
+    for i in range(0, len(sequence)):
+        print "Started App {0}".format(i + 1)
         temp_divide.value = 1
-        thread.start_new_thread(function=application, args=(10,))
+        if sequence[i][0] == "f":
+            shared_seq_list = sequence[i][2]
+            t = Thread(target=sequence[i][1],
+                       args=(times[i], shared_seq_list, ))
+            t.start()
+            threads.append(t)
+        elif sequence[i][0] == "l":
+            for j in range(0, len(sequence[i][1])):
+                shared_seq_list[j] = sequence[i][1][j]
+        elif sequence[i][0] == "fs":
+            t = Thread(target=sequence[i][1],
+                       args=(times[i], ))
+            t.start()
+            threads.append(t)
+        elif sequence[i][0] == "fn":
+            t = Thread(target=sequence[i][1])
+            t.start()
+            threads.append(t)
         time.sleep(13)
+    for t in threads:
+        t.join()
     stop.value = 1
     monitor.join()
-    common_camera.release()
+    video_app.destroy()
     voice_app.destroy()
+    network_app.destroy()
     return data
 
 
@@ -173,8 +199,10 @@ def experiment1(seq):
         mic_recorder = Applications.VoiceRecorder()
         mic_recorder.record(16)
         mic_recorder.destroy()
-    # elif seq == 5:
-    #     # Waiting on Aji to complete this application
+    elif seq == 5:
+        network_app = Applications.NetworkApplication()
+        network_app.transfer()
+        network_app.destroy()
     else:
         time.sleep(16)
     temp_divide.value = 1
@@ -185,12 +213,20 @@ def experiment1(seq):
 
 
 def main(experiment, sequence):
-    for i in range(0, 10):
-        if experiment == 1:
+    if not os.path.isdir("test_files"):
+        os.makedirs("test_files")
+        Applications.NetworkApplication.generate_files()
+    else:
+        if len(os.listdir("test_files")) < 20:
+            Applications.NetworkApplication.generate_files(
+                20 - len(os.listdir("test_files")))
+    if experiment == 1:
+        for i in range(0, 20):
             data = experiment1(sequence)
-        else:
-            data = experiment2(sequence)
-        dump_data(data, experiment, sequence, i + 1)
+            dump_data(data, experiment, sequence, i + 1)
+    else:
+        data = experiment2(sequence)
+        dump_data(data, experiment, sequence, 0)
 
 
 if __name__ == "__main__":
