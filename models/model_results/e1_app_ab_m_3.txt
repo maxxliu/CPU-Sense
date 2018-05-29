@@ -1,0 +1,8 @@
+Results of Grid Search:
+	Best n estimators:      550.000000
+	Best learning rate:     0.250000
+	---
+	Best Score:           0.943750
+
+Results on Test Data:
+	Score:                0.800000

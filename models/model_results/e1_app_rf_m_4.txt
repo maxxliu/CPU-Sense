@@ -1,0 +1,8 @@
+Results of Grid Search:
+	Best n estimators:      110.000000
+	Best max features:      log2
+	---
+	Best Score:           0.931250
+
+Results on Test Data:
+	Score:                0.950000
