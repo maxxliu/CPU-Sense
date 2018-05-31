@@ -1,0 +1,70 @@
+Main Header: Evaluation
+
+To reiterate, the goal of this project is to evaluate how well we can
+classify the current state of a device (what applications are currently open),
+and what applications are being opened. Furthermore, we want to do so under
+two scenarios, one in which we have access to the device (we have application
+level data such as which applications are currently open) and one in which we
+do not have access to the device. To do so, we first parsed through the CPU
+trace files from our experiments and used the generated training and testing
+files to train decision tree based classification models.
+
+Sub Header: Data Parsing
+
+In order to make our classification models as close to real life as possible, we
+used only the features that would be available if we had actually remotely
+sensed the CPU usage. The features that we used for our models only involved
+aggregate CPU data and application level data. Features that involved reads,
+writes, and networking data were removed. It is important to note that
+networking data is easy to obtain and would make our models much more
+accurate. Additionally, features that involved individual core data was
+removed. Using the individual CPU data we were able to find aggregate CPU data
+which is a much more realistic feature to use. We ultimately ended up with
+200 data points for experiment one and 800 data points for experiment 2.
+
+To create the data to train our models, we found the points that an application
+was opened and cut a part of that trace file out. One second was used
+before that point and eight seconds were used after that point. Additionally,
+a nine second interval was captured after the application had been opened
+for three seconds. This was done to include CPU trace data on time periods
+where we know that no applications were being opened and thus the state of the
+device must remain the same.
+
+Beyond the aggregate CPU time-series data that we had extracted from the larger
+trace files. We also computed the derivative of this time-series in order to
+capture features related to the speed at which CPU usage changed as it is
+possible that different CPU applications take over CPU usage at different
+speeds.
+
+Sub Header: Classification Models
+
+For the two experiments that we conducted we will first discuss the binary
+classification results, next we will discuss the application level
+classification results, and finally we will finish with a discussion on the
+device state classification results.
+
+The area that we evaluated was whether or not we would be able to take CPU
+traces and classify whether or not an application was opened, a binary problem.
+For the binary classification, we chose to go with support vector machine,
+logistic regression, and random forest models. The support vector model and
+logistic regression model were chosen due to their affinity towards solving
+binary problems. The random forest was included later after observing the
+models performance on the other classification tasks. To preface the results
+of our models, a dummy classifier was trained as well to see how well our models
+perform as compared to a model that learned nothing. The accuracy of this model
+was 42%.
+
+For experiment one, we observed that the random forest model produced
+the best results in both scenarios. Even without the application level data
+the model was able to classify with a 93% accuracy, with the application level
+data the accuracy improved to 95%. For experiment two, the random forest and
+logistic regression models both produced similar results with and without the
+application level data. The random forest model had an 84% accuracy with
+application data and an 81% accuracy without application data when using a
+logistic regression model. When looking at the confusion matrix we observe
+that most of the wrong classifications are classifying turning on an
+application as no changes happening. It is possible that when many applications
+are open together it becomes difficult to distinguish between an idle state and
+a fully utilized state. If we look at the feature importance graph the top
+feature is CPU variance, the variance of these two states is probably very
+similar when the CPU is running at high capacity.

@@ -1,0 +1,11 @@
+Sub Header: Different Classification Models
+
+In this paper we focus primarily on decision tree based models in order to
+retain interpretability. Additionally, we solely used statistical data from
+our CPU time-series data to train models. As we have seen, just by using these
+features we are able to produce results around 70%; however, it is possible that
+there are some temporal features in our CPU time-series data that would make
+a classification model that takes in such features much more effective. Possible
+avenues for exploration include an autoregressive moving average model (ARMA) or
+a recurrent neural network (RNN). These would both do well in utilizing the
+time series data but may come at the expense of interpretability.

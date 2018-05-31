@@ -64,7 +64,7 @@ def load_model(model_name):
     return model
 
 
-def display_confusion_matrix(model_name, features=False):
+def display_confusion_matrix(model_name):
     '''
     given a model will display the confusion matrix
     '''
@@ -156,8 +156,8 @@ def graph_binary_results():
     ax.set_xticklabels(x_labels)
     ax.legend((rects1[0], rects2[0]), ('Experiment 1', 'Experiment 2'))
 
-    autolabel(rects1)
-    autolabel(rects2)
+    autolabel(rects1, ax)
+    autolabel(rects2, ax)
 
     plt.show()
 
@@ -197,9 +197,9 @@ def graph_app_results():
     ax.legend((rects1[0], rects2[0], rects3[0]), \
                 ('Random Forest', 'Adaboost', 'Gradientboost'))
 
-    autolabel(rects1)
-    autolabel(rects2)
-    autolabel(rects3)
+    autolabel(rects1, ax)
+    autolabel(rects2, ax)
+    autolabel(rects3, ax)
 
     plt.show()
 
@@ -230,9 +230,9 @@ def graph_app_results():
     ax.legend((rects1[0], rects2[0], rects3[0]), \
                 ('Random Forest', 'Adaboost', 'Gradientboost'))
 
-    autolabel(rects1)
-    autolabel(rects2)
-    autolabel(rects3)
+    autolabel(rects1, ax)
+    autolabel(rects2, ax)
+    autolabel(rects3, ax)
 
     plt.show()
 
