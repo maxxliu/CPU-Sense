@@ -43,7 +43,7 @@ classification results, next we will discuss the application level
 classification results, and finally we will finish with a discussion on the
 device state classification results.
 
-The area that we evaluated was whether or not we would be able to take CPU
+To begin, the area that we evaluated was whether or not we would be able to take CPU
 traces and classify whether or not an application was opened, a binary problem.
 For the binary classification, we chose to go with support vector machine,
 logistic regression, and random forest models. The support vector model and
@@ -68,3 +68,51 @@ are open together it becomes difficult to distinguish between an idle state and
 a fully utilized state. If we look at the feature importance graph the top
 feature is CPU variance, the variance of these two states is probably very
 similar when the CPU is running at high capacity.
+
+For our next classification problem, we used the same data from the binary
+classification but with the goal of classifying which application was opened.
+Initially we expected to see the accuracy of our model decrease but surprisingly
+we found that the accuracy of the models were actually quite similar to that of
+the binary classification. For the application classification models we used
+three different tree based models; random forest, adaboost, and gradient
+boost. Across both experiments, with and without application state data,
+random forest generally performed the best out of all of them. With the state
+data, random forest was able to achieve 93% accuracy on experiment one and
+86% accuracy with experiment two. Around 300 decision trees were built to
+help classify the application being opened. When we did not include the state
+data as a feature, the results from the random forest classifier were around
+the same for experiment one, 95% accuracy, but significantly worse for
+experiment two where the start states varied widely, the accuracy was 68%.
+We believe that this comes from the fact that some of the apps open with a
+similar CPU trace.
+
+One interesting observation from the binary and application classification
+models is that with the state data for experiment two, the two problems
+actually have very similar accuracy scores (84% and 86% respectively).
+Intuitively we would expect to see that the score go down but when we look at
+the confusion matrix we can see that almost all of the incorrect classifications
+are misclassified as no activity occurring which is why the two problems
+produce similar performance scores.
+
+The most difficult classification problem is that of classifying the state of
+the device using only the CPU trace data. This would be incredibly useful in a
+situation where we do not have access to an IoT device and would like to know
+exactly what the device is doing. For this problem we are only allowed to use
+the CPU data. Again we use the same models that we used to solve the previous
+two problems, the results were the best for the random forest model with an
+accuracy of 58%. This accuracy is understandably worse than the previous
+classification problems but is not a bad result considering all features
+were removed, even the granularity of individual CPU core usage, and only
+aggregate CPU usage was used. This classification could perhaps be improved
+by using a model that takes in the time series as input.
+
+An interesting question to pose next is if it is possible that opening up an
+application has a different CPU trace change depending on the current state of
+the device. For example, if we open a video recording application while two
+other applications are also running or if we open a video recording application
+while four other applications are also running, will we see a difference in
+how CPU changes? This could be a possible scenario if we have access to an IoT
+device and would like to know exactly what is running on our device. When we
+ran the models and included the application opening data we observed that
+random forest model improved to 73% accuracy which seems to suggest there is
+some difference in CPU change depending on the current state of the device.

@@ -1,9 +1,9 @@
 Results of Grid Search:
-	Best n estimators:      200.000000
-	Best learning rate:     0.250000
+	Best n estimators:      500.000000
+	Best learning rate:     0.500000
 	Best max features:      sqrt
 	---
-	Best Score:           0.741776
+	Best Score:           0.751645
 
 Results on Test Data:
-	Score:                0.697368
+	Score:                0.664474

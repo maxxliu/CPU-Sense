@@ -130,7 +130,7 @@ def graph_binary_results():
     graph results from binary models
     '''
     plt.style.use('ggplot')
-    plt.rc('font', size=12)
+    plt.rc('font', size=30)
     # first graph the binary classification results together
     # only random forest results were saved because the other results were bad
     e1_binary = ['e1_binary_rf_m_3.txt', 'e1_binary_rf_m_4.txt']
@@ -156,8 +156,8 @@ def graph_binary_results():
     ax.set_xticklabels(x_labels)
     ax.legend((rects1[0], rects2[0]), ('Experiment 1', 'Experiment 2'))
 
-    autolabel(rects1, ax)
-    autolabel(rects2, ax)
+    # autolabel(rects1, ax)
+    # autolabel(rects2, ax)
 
     plt.show()
 
@@ -169,7 +169,7 @@ def graph_app_results():
     For this I will need to make 2 graphs, one for mode 3 and one for mode 4
     '''
     plt.style.use('ggplot')
-    plt.rc('font', size=12)
+    plt.rc('font', size=30)
     # mode 3 graph
     rf = ['e1_app_rf_m_3.txt', 'e2_app_rf_m_3.txt']
     ab = ['e1_app_ab_m_3.txt', 'e2_app_ab_m_3.txt']
@@ -190,16 +190,16 @@ def graph_app_results():
     rects2 = ax.bar(ind+width, ab, width)
     rects3 = ax.bar(ind+width*2, gb, width)
 
-    plt.title('Application Classification (With State Data)')
+    plt.title('Application Classification (State Data)')
     ax.set_ylabel('Accuracy')
     ax.set_xticks(ind+width)
     ax.set_xticklabels(x_labels)
     ax.legend((rects1[0], rects2[0], rects3[0]), \
-                ('Random Forest', 'Adaboost', 'Gradientboost'))
+                ('Random Forest', 'Adaboost', 'Gradientboost'), loc=3)
 
-    autolabel(rects1, ax)
-    autolabel(rects2, ax)
-    autolabel(rects3, ax)
+    # autolabel(rects1, ax)
+    # autolabel(rects2, ax)
+    # autolabel(rects3, ax)
 
     plt.show()
 
@@ -223,16 +223,16 @@ def graph_app_results():
     rects2 = ax.bar(ind+width, ab, width)
     rects3 = ax.bar(ind+width*2, gb, width)
 
-    plt.title('Application Classification (Without State Data)')
+    plt.title('Application Classification (No State Data)')
     ax.set_ylabel('Accuracy')
     ax.set_xticks(ind+width)
     ax.set_xticklabels(x_labels)
     ax.legend((rects1[0], rects2[0], rects3[0]), \
-                ('Random Forest', 'Adaboost', 'Gradientboost'))
+                ('Random Forest', 'Adaboost', 'Gradientboost'), loc=3)
 
-    autolabel(rects1, ax)
-    autolabel(rects2, ax)
-    autolabel(rects3, ax)
+    # autolabel(rects1, ax)
+    # autolabel(rects2, ax)
+    # autolabel(rects3, ax)
 
     plt.show()
 
@@ -242,7 +242,7 @@ def graph_state_results():
     graph results from state models
     '''
     plt.style.use('ggplot')
-    plt.rc('font', size=12)
+    plt.rc('font', size=30)
     # mode 1 graph
     rf = ['e1_state_rf_m_1.txt', 'e2_state_rf_m_1.txt']
     ab = ['e1_state_ab_m_1.txt', 'e2_state_ab_m_1.txt']
@@ -268,11 +268,11 @@ def graph_state_results():
     ax.set_xticks(ind+width)
     ax.set_xticklabels(x_labels)
     ax.legend((rects1[0], rects2[0], rects3[0]), \
-                ('Random Forest', 'Adaboost', 'Gradientboost'))
+                ('Random Forest', 'Adaboost', 'Gradientboost'), loc=3)
 
-    autolabel(rects1, ax)
-    autolabel(rects2, ax)
-    autolabel(rects3, ax)
+    # autolabel(rects1, ax)
+    # autolabel(rects2, ax)
+    # autolabel(rects3, ax)
 
     plt.show()
 
@@ -301,10 +301,10 @@ def graph_state_results():
     ax.set_xticks(ind+width)
     ax.set_xticklabels(x_labels)
     ax.legend((rects1[0], rects2[0], rects3[0]), \
-                ('Random Forest', 'Adaboost', 'Gradientboost'))
+                ('Random Forest', 'Adaboost', 'Gradientboost'), loc=3)
 
-    autolabel(rects1, ax)
-    autolabel(rects2, ax)
-    autolabel(rects3, ax)
+    # autolabel(rects1, ax)
+    # autolabel(rects2, ax)
+    # autolabel(rects3, ax)
 
     plt.show()
